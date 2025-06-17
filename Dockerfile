@@ -89,7 +89,7 @@ LABEL org.opencontainers.image.source="https://github.com/n8n-io/n8n"
 LABEL org.opencontainers.image.url="https://n8n.io"
 LABEL org.opencontainers.image.version="1.90.2"
 
-ENV N8N_VERSION=1.90.2
+ENV N8N_VERSION=latest
 ENV NODE_ENV=production
 ENV N8N_RELEASE_TYPE=stable
 
