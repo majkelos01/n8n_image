@@ -1,0 +1,12 @@
+{
+  "runners": {
+    "javascript": {
+      "enabled": true,
+      "mode": "internal"
+    },
+    "python": {
+      "enabled": true,
+      "mode": "internal"
+    }
+  }
+}
