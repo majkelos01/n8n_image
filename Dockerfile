@@ -18,6 +18,7 @@ ENV NODE_ENV=production
 
 RUN set -eux; \
     npm install -g --omit=dev n8n@${N8N_VERSION} --ignore-scripts && \
+    npm install -g semver && \
     npm rebuild --prefix=/usr/local/lib/node_modules/n8n sqlite3 && \
     find /usr/local/lib/node_modules/n8n -type f -name "*.ts" -o -name "*.js.map" -o -name "*.vue" | xargs rm -f && \
     rm -rf /root/.npm
