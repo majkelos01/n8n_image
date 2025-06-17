@@ -83,11 +83,11 @@ EXPOSE 5678
 ARG N8N_VERSION=latest
 RUN if [ -z "$N8N_VERSION" ] ; then echo "The N8N_VERSION argument is missing!" ; exit 1; fi
 
-LABEL org.opencontainers.image.title=n8n
-LABEL org.opencontainers.image.description=Workflow Automation Tool
-LABEL org.opencontainers.image.source=https://github.com/n8n-io/n8n
-LABEL org.opencontainers.image.url=https://n8n.io
-LABEL org.opencontainers.image.version=1.90.2
+LABEL org.opencontainers.image.title="n8n"
+LABEL org.opencontainers.image.description="Workflow Automation Tool"
+LABEL org.opencontainers.image.source="https://github.com/n8n-io/n8n"
+LABEL org.opencontainers.image.url="https://n8n.io"
+LABEL org.opencontainers.image.version="1.90.2"
 
 ENV N8N_VERSION=1.90.2
 ENV NODE_ENV=production
