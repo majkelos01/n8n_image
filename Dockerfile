@@ -23,17 +23,21 @@ RUN set -eux; \
     find /usr/local/lib/node_modules/n8n -type f -name "*.ts" -o -name "*.js.map" -o -name "*.vue" | xargs rm -f && \
     rm -rf /root/.npm
 
+# Install Python packages in builder
+RUN apt-get update && apt-get install -y python3-venv && \
+    python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --no-cache-dir moviepy==1.0.3 mcp==1.0.0 && \
+    npm install -g @modelcontextprotocol/sdk && \
+    rm -rf /var/lib/apt/lists/*
+
 # Runtime stage
 FROM node:22-bullseye
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     python3 \
-    python3-pip \
     curl \
     ffmpeg \
-    python3-numpy \
-    python3-pil \
     git \
     tini \
     && rm -rf /var/lib/apt/lists/*
@@ -41,7 +45,11 @@ RUN apt-get update && apt-get install -y \
 # Copy n8n from builder stage
 COPY --from=builder /usr/local/lib/node_modules/n8n /usr/local/lib/node_modules/n8n
 COPY --from=builder /usr/local/lib/node_modules/semver /usr/local/lib/node_modules/semver
+COPY --from=builder /usr/local/lib/node_modules/@modelcontextprotocol /usr/local/lib/node_modules/@modelcontextprotocol
 COPY --from=builder /usr/local/bin/n8n /usr/local/bin/n8n
+
+# Copy Python venv from builder stage
+COPY --from=builder /opt/venv /opt/venv
 
 # Copy application files
 COPY n8n-task-runners.json /etc/n8n-task-runners.json
@@ -55,7 +63,7 @@ RUN rm -rf /tmp/v8-compile-cache*
 ENV NODE_ICU_DATA=/usr/local/lib/node_modules/full-icu
 ENV NODE_ENV=production
 ENV N8N_RELEASE_TYPE=stable
-ENV SHELL=/bin/sh
+ENV SHELL=/bin/bash
 
 # Install task runner launcher
 ARG TARGETPLATFORM=linux/amd64
@@ -65,13 +73,8 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
         chmod +x /usr/local/bin/task-runner-launcher; \
     fi
 
-# Install Python dependencies and MCP tools
-RUN python3 -m venv /opt/venv
+# Set Python venv in PATH
 ENV PATH=/opt/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
-# Install Python and Node.js packages
-RUN /opt/venv/bin/pip install --no-cache-dir moviepy==1.0.3 mcp==1.0.0 && \
-    npm install -g @modelcontextprotocol/sdk
 
 # Create directories and install MCP servers
 # RUN mkdir -p /usr/local/scripts /opt/mcp-servers && \
@@ -84,14 +87,14 @@ RUN /opt/venv/bin/pip install --no-cache-dir moviepy==1.0.3 mcp==1.0.0 && \
 # ENV PATH=/opt/mcp-servers/servers/bin:$PATH
 
 # Final setup
-RUN mkdir -p /home/node/.n8n && chown -R node:node /home/node
+RUN mkdir -p /home/node/.n8n && chown -R node:node /home/node /opt/venv
 
 # Add labels
 LABEL org.opencontainers.image.title="n8n"
 LABEL org.opencontainers.image.description="Workflow Automation Tool"
 LABEL org.opencontainers.image.source="https://github.com/n8n-io/n8n"
 LABEL org.opencontainers.image.url="https://n8n.io"
-LABEL org.opencontainers.image.version="1.90.2"
+LABEL org.opencontainers.image.version="1.97.1"
 
 # Expose port
 EXPOSE 5678
