@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20.19.0-alpine3.21 AS builder
+FROM node:22-bullseye AS builder
 
 # Install build dependencies
 RUN apk add --no-cache \
@@ -13,7 +13,7 @@ RUN apk add --no-cache \
     build-base
 
 # Install n8n
-ARG N8N_VERSION=latest
+ARG N8N_VERSION=1.97.1
 ENV NODE_ENV=production
 
 RUN set -eux; \
@@ -72,14 +72,14 @@ RUN /opt/venv/bin/pip install --no-cache-dir moviepy==1.0.3 mcp==1.0.0 && \
     npm install -g @modelcontextprotocol/sdk
 
 # Create directories and install MCP servers
-RUN mkdir -p /usr/local/scripts /opt/mcp-servers && \
-    cd /opt/mcp-servers && \
-    git clone https://github.com/modelcontextprotocol/servers.git && \
-    chown -R node:node /opt/venv /opt/mcp-servers /usr/local/scripts
+# RUN mkdir -p /usr/local/scripts /opt/mcp-servers && \
+#     cd /opt/mcp-servers && \
+#     git clone https://github.com/modelcontextprotocol/servers.git && \
+#     chown -R node:node /opt/venv /opt/mcp-servers /usr/local/scripts
 
 # Add MCP server examples to PATH
-ENV MCP_SERVERS_PATH=/opt/mcp-servers/servers
-ENV PATH=/opt/mcp-servers/servers/bin:$PATH
+# ENV MCP_SERVERS_PATH=/opt/mcp-servers/servers
+# ENV PATH=/opt/mcp-servers/servers/bin:$PATH
 
 # Final setup
 RUN mkdir -p /home/node/.n8n && chown -R node:node /home/node
