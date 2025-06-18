@@ -26,7 +26,7 @@ RUN set -eux; \
 # Install Python packages in builder
 RUN apt-get update && apt-get install -y python3-venv && \
     python3 -m venv /opt/venv && \
-    /opt/venv/bin/pip install --no-cache-dir moviepy==1.0.3 mcp==1.0.0 && \
+    /opt/venv/bin/pip install --no-cache-dir moviepy==1.0.3 && \
     npm install -g @modelcontextprotocol/sdk && \
     rm -rf /var/lib/apt/lists/*
 
