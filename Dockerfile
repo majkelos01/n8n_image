@@ -2,15 +2,15 @@
 FROM node:22-bullseye AS builder
 
 # Install build dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     python3 \
-    py3-pip \
+    python3-pip \
     gcc \
     python3-dev \
-    musl-dev \
     curl \
     git \
-    build-base
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install n8n
 ARG N8N_VERSION=1.97.1
