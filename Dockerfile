@@ -27,18 +27,20 @@ RUN set -eux; \
 FROM node:22-bullseye
 
 # Install runtime dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     python3 \
-    py3-pip \
+    python3-pip \
     curl \
     ffmpeg \
-    py3-numpy \
-    py3-pillow \
+    python3-numpy \
+    python3-pil \
     git \
-    tini
+    tini \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy n8n from builder stage
 COPY --from=builder /usr/local/lib/node_modules/n8n /usr/local/lib/node_modules/n8n
+COPY --from=builder /usr/local/lib/node_modules/semver /usr/local/lib/node_modules/semver
 COPY --from=builder /usr/local/bin/n8n /usr/local/bin/n8n
 
 # Copy application files
