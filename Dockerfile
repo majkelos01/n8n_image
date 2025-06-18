@@ -24,7 +24,7 @@ RUN set -eux; \
     rm -rf /root/.npm
 
 # Runtime stage
-FROM node:20.19.0-alpine3.21
+FROM node:22-bullseye
 
 # Install runtime dependencies
 RUN apk add --no-cache \
