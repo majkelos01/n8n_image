@@ -17,8 +17,7 @@ ARG N8N_VERSION=1.97.1
 ENV NODE_ENV=production
 
 RUN set -eux; \
-    npm install -g --omit=dev n8n@${N8N_VERSION} --ignore-scripts && \
-    npm install -g semver && \
+    npm install -g --omit=dev n8n@${N8N_VERSION} semver --ignore-scripts && \
     npm rebuild --prefix=/usr/local/lib/node_modules/n8n sqlite3 && \
     find /usr/local/lib/node_modules/n8n -type f -name "*.ts" -o -name "*.js.map" -o -name "*.vue" | xargs rm -f && \
     rm -rf /root/.npm
@@ -43,13 +42,16 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy n8n from builder stage
-COPY --from=builder /usr/local/lib/node_modules/n8n /usr/local/lib/node_modules/n8n
-COPY --from=builder /usr/local/lib/node_modules/semver /usr/local/lib/node_modules/semver
-COPY --from=builder /usr/local/lib/node_modules/@modelcontextprotocol /usr/local/lib/node_modules/@modelcontextprotocol
-COPY --from=builder /usr/local/bin/n8n /usr/local/bin/n8n
+COPY --from=builder /usr/local/lib/node_modules /usr/local/lib/node_modules
 
 # Copy Python venv from builder stage
 COPY --from=builder /opt/venv /opt/venv
+
+# Create n8n binary symlink and rebuild sqlite3
+RUN ln -sf /usr/local/lib/node_modules/n8n/bin/n8n /usr/local/bin/n8n && \
+    cd /usr/local/lib/node_modules/n8n && \
+    npm rebuild sqlite3 && \
+    cd -
 
 # Copy application files
 COPY n8n-task-runners.json /etc/n8n-task-runners.json
